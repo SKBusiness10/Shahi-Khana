@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Customer traditional breakfast order details",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order identifier"
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Full name of the customer"
+        },
+        "customerAddress": {
+          "type": "string",
+          "description": "Delivery address or pickup instructions"
+        },
+        "orderMethod": {
+          "type": "string",
+          "enum": ["takeaway", "delivery"],
+          "description": "Whether the order is picked up of shipped"
+        },
+        "items": {
+          "type": "array",
+          "description": "The breakfast delicacies and portion sizing being requested"
+        },
+        "subtotal": {
+          "type": "integer",
+          "description": "Cost of individual foods items"
+        },
+        "packagingFee": {
+          "type": "integer",
+          "description": "Packaging fee for takeaway boxes"
+        },
+        "deliveryFee": {
+          "type": "integer",
+          "description": "Home shipping fee if delivered"
+        },
+        "grandTotal": {
+          "type": "integer",
+          "description": "Grand total in Rupees"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "confirmed", "rejected"],
+          "description": "Current authorization status of order"
+        },
+        "orderDate": {
+          "type": "string",
+          "description": "Date reference of placement"
+        }
+      },
+      "required": ["id", "customerName", "customerAddress", "orderMethod", "items", "subtotal", "grandTotal", "status", "orderDate"]
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "Dynamic food and beverage menu item card details",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique menu item identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Descriptive English name of the food item"
+        },
+        "nameUrdu": {
+          "type": "string",
+          "description": "Calligraphic Urdu name of the breakfast item"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of contents, taste profile, and ingredients"
+        },
+        "priceHalf": {
+          "type": "integer",
+          "description": "Optional price for half portion sizes in rupees"
+        },
+        "priceFull": {
+          "type": "integer",
+          "description": "Price for standard or full portion size in rupees"
+        },
+        "hasHalfOption": {
+          "type": "boolean",
+          "description": "Whether the user can choose between half and full sizes"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["breakfast", "bread", "dairy", "beverages"],
+          "description": "Food category classification"
+        },
+        "isSpecialty": {
+          "type": "boolean",
+          "description": "Whether the breakfast item is a recommended house specialty"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Average review score rating"
+        },
+        "reviewCount": {
+          "type": "integer",
+          "description": "Inbounding total review feedback counter"
+        }
+      },
+      "required": ["id", "name", "nameUrdu", "description", "priceFull", "hasHalfOption", "category"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Live traditional food orders pipeline"
+    },
+    "/menu_items/{itemId}": {
+      "schema": "MenuItem",
+      "description": "Dynamic food items database"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Shahi Khana Nashta Point",
+  "description": "A responsive, traditional, classy, and highly interactive restaurant menu and billing slip website for Shahi Khana Nashta Point & Milk Shop in Multan, Pakistan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

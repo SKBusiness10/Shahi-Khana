@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net default catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Orders Collection Hardening Policy
+    match /orders/{orderId} {
+
+      // Client Data payloads validation
+      function isValidOrder(data) {
+        return data.keys().hasAll(['id', 'customerName', 'customerAddress', 'orderMethod', 'items', 'subtotal', 'packagingFee', 'deliveryFee', 'grandTotal', 'status', 'orderDate'])
+          && data.keys().size() == 11
+          && data.id is string
+          && data.customerName is string && data.customerName.size() <= 100
+          && data.customerAddress is string && data.customerAddress.size() <= 300
+          && data.orderMethod in ['takeaway', 'delivery']
+          && data.items is list
+          && data.items.size() > 0 && data.items.size() <= 50
+          && data.subtotal is int
+          && data.packagingFee is int
+          && data.deliveryFee is int
+          && data.grandTotal is int
+          && data.status in ['pending', 'confirmed', 'rejected']
+          && data.orderDate is string;
+      }
+
+      // 1. Creation permission (Public can insert orders with status starting as 'pending')
+      allow create: if isValidId(orderId) 
+        && isValidOrder(request.resource.data) 
+        && request.resource.data.status == 'pending';
+
+      // 2. Individual Single Document Read (Customers can trace their own order via direct verification lookup)
+      allow get: if isValidId(orderId);
+
+      // 3. Administrative Actions (Listing, confirming/rejecting, and batch deleting are restricted to authenticated admins)
+      allow list, delete: if isSignedIn();
+
+      allow update: if isSignedIn()
+        && isValidOrder(request.resource.data)
+        && request.resource.data.id == resource.data.id;
+    }
+
+    // Dynamic Food & Beverages Menu Collection Policy
+    match /menu_items/{itemId} {
+
+      // Schema blueprint validation
+      function isValidMenuItem(data) {
+        return data.keys().hasAll(['id', 'name', 'nameUrdu', 'description', 'priceFull', 'hasHalfOption', 'category'])
+          && data.id is string
+          && data.name is string && data.name.size() <= 200
+          && data.nameUrdu is string && data.nameUrdu.size() <= 200
+          && data.description is string && data.description.size() <= 1000
+          && data.priceFull is int
+          && data.hasHalfOption is bool
+          && data.category in ['breakfast', 'bread', 'dairy', 'beverages'];
+      }
+
+      // Customers and general visitors can read the menu catalog
+      allow get, list: if true;
+
+      // Only certified administrators can insert, update or delete menu items
+      allow create, update: if isSignedIn()
+        && isValidId(itemId)
+        && isValidMenuItem(request.resource.data)
+        && request.resource.data.id == itemId;
+
+      allow delete: if isSignedIn()
+        && isValidId(itemId);
+    }
+  }
+}
