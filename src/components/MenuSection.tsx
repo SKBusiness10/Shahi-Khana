@@ -59,7 +59,7 @@ export default function MenuSection({
     const calculateBillOnBackend = async () => {
       setIsCalculating(true);
       try {
-        const response = await fetch('/api/calculate-bill', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/calculate-bill`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -604,7 +604,7 @@ export default function MenuSection({
                         // If billing summary is not fetched yet for some reason, calculate/fetch it
                         if (!billingSummary || billingSummary.grandTotal <= 0) {
                           try {
-                            const res = await fetch('/api/calculate-bill', {
+                            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/calculate-bill`, {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ cart, orderMethod, menuItems })
