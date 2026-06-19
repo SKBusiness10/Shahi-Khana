@@ -600,7 +600,7 @@ export default function MenuSection({
                               priceByUnit: oi.pricePerUnit,
                               total: oi.total
                             }));
-
+             
                         // If billing summary is not fetched yet for some reason, calculate/fetch it
                         if (!billingSummary || billingSummary.grandTotal <= 0) {
                           try {

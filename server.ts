@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -7,7 +8,9 @@ import { MenuItem } from "./src/types";
 async function startServer() {
   const app = express();
   const PORT = 3000;
-
+  app.use(cors({
+  origin: ["https://shahi-khana.vercel.app", "http://localhost:3000"]
+}));
   // JSON body parser
   app.use(express.json());
 
